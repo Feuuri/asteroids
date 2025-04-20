@@ -4,9 +4,9 @@ from player import Player
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # Set up the screen
-    clock = pygame.time.Clock()  # Initialize the Clock for FPS management
-    dt = 0  # Initialize delta time
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    clock = pygame.time.Clock()
+    dt = 0
     
     # Create the player in the center of the screen
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
@@ -19,17 +19,20 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
         
+        # Update delta time first
+        dt = clock.tick(60) / 1000  # Convert milliseconds to seconds
+        
+        # Update the player state
+        player.update(dt)
+        
         # Fill the screen with black
         screen.fill("black")
         
-        # Draw the player
+        # Draw the player (after updating)
         player.draw(screen)
         
         # Update the display
         pygame.display.flip()
-        
-        # Tick the clock and update delta time
-        dt = clock.tick(60) / 1000  # Limit FPS to 60 and calculate delta time in seconds
 
 if __name__ == "__main__":
     main()
