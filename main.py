@@ -1,59 +1,55 @@
+import sys
 import pygame
 from constants import *
 from player import Player
+from asteroid import Asteroid
+from asteroidfield import AsteroidField
+from shot import Shot
+
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
-    dt = 0
-    
-    # Create the groups
-    all_sprites = pygame.sprite.Group()  # New group for all sprites
+
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
-    collidable = pygame.sprite.Group()   # New group for objects that can collide
-    
-    # Set the containers for the Player class
-    # Player is in all_sprites, updatable, drawable, and collidable
-    Player.containers = (all_sprites, updatable, drawable, collidable)
-    
-    # Create the player in the center of the screen
+    asteroids = pygame.sprite.Group()
+    shots = pygame.sprite.Group()
+
+    Asteroid.containers = (asteroids, updatable, drawable)
+    Shot.containers = (shots, updatable, drawable)
+    AsteroidField.containers = updatable
+    asteroid_field = AsteroidField()
+
+    Player.containers = (updatable, drawable)
+
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
-    # Game loop
-    running = True
-    while running:
-        # Check for quit events
+    dt = 0
+
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-        
-        # Update delta time first
-        dt = clock.tick(60) / 1000  # Convert milliseconds to seconds
-        
-        # Update all updatable objects
+                return
+
         updatable.update(dt)
-        
-        # Example of collision detection (if you had other collidable objects)
-        # This would check if player collides with any other collidable object
-        # collisions = pygame.sprite.spritecollide(player, collidable, False)
-        # for collision in collisions:
-        #     if collision != player:  # Don't collide with yourself!
-        #         handle_collision(player, collision)
-        
-        # Fill the screen with black
+
+        for asteroid in asteroids:
+            if asteroid.collides_with(player):
+                print("Game over!")
+                sys.exit()
+
         screen.fill("black")
-        
-        # Draw all drawable objects
-        for entity in drawable:
-            entity.draw(screen)
-        
-        # Alternative way to draw all sprites (if they use the standard Sprite draw method)
-        # all_sprites.
-        
-        # Update the display
+
+        for obj in drawable:
+            obj.draw(screen)
+
         pygame.display.flip()
+
+        # limit the framerate to 60 FPS
+        dt = clock.tick(60) / 1000
+
 
 if __name__ == "__main__":
     main()
